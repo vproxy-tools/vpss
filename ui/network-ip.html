@@ -1,0 +1,63 @@
+<!-- ok -->
+<div id="app-network-ip" v-show="network.page == 'ip'">
+  <div v-for="net in network.data.networks">
+    <table class="ui single line unstackable table" v-bind:class="[theme.primary]">
+      <thead>
+        <tr>
+          <th colspan="6">{{ $t("network.vni") }}: {{ network_name(net.vni) }}</th>
+        </tr>
+        <tr v-if="net.ips.length">
+          <th class="four wide">{{ $t("network.ip") }}</th>
+          <th class="four wide">{{ $t("network.mac") }}</th>
+          <th class="two wide">{{ $t("network.ip.routing") }}</th>
+          <th class="six wide right aligned">{{ $t("operation") }}</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr v-if="net.ips.length == 0">
+          <td class="disabled center aligned" colspan="4">{{ $t("network.ip.no_ip") }}</td>
+        </tr>
+        <tr v-for="ip in net.ips">
+          <td class="mono">{{ ip.ip }}</td>
+          <td class="mono">{{ ip.mac }}</td>
+          <td>
+            <div class="ui fitted slider checkbox" v-bind:class="{'disabled': ip.system}"
+              v-on:click="toggleIpRouting(net, ip)">
+              <input v-bind:id="'net-' + net.vni + '-ip-routing-' + formatIp(ip.ip)" type="checkbox"
+                v-model="ip.routing">
+              <label>&nbsp;</label>
+            </div>
+          </td>
+          <td class="right aligned">
+            <div class="ui right floated tiny labeled icon button"
+              v-bind:class="[theme.secondary, ip.system?'disabled':'']" v-on:click="delIp(net, ip)">
+              <i class="minus icon"></i>
+              {{ $t("network.ip.remove") }}
+            </div>
+          </td>
+        </tr>
+      </tbody>
+      <tfoot class="full-width">
+        <tr>
+          <th>
+            <div class="ui input"><input type="text" v-bind:placeholder="[ $t('network.ip') ]" v-model="net.new_ip.ip">
+            </div>
+          </th>
+          <th>
+            <div class="ui input"><input type="text" v-bind:placeholder="[ $t('network.mac') ]"
+                v-model="net.new_ip.mac"></div>
+          </th>
+          <th>&nbsp;</th>
+          <th>
+            <div class="ui right floated small labeled icon button" v-bind:class="[theme.primary]"
+              v-on:click="addIp(net)">
+              <i class="add icon"></i>
+              {{ $t("network.ip.add") }}
+            </div>
+          </th>
+        </tr>
+      </tfoot>
+    </table>
+    <div style="margin-bottom: 20px;"></div>
+  </div> <!-- ip -->
+</div>

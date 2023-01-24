@@ -1,0 +1,42 @@
+<!-- ok -->
+<div id="app-advance-flow" v-show="advance.page == 'flow'">
+  <table class="ui single line unstackable table" v-bind:class="[theme.primary]">
+    <thead>
+    <tr>
+      <th>{{ $t("advance.flow_table.title") }}</th>
+      <th class="right aligned">
+        <label>{{ $t("advance.flow_table.enable") }}</label>
+        <div class="ui fitted slider checkbox" v-on:click="toggleEnableDisableFlow()">
+          <input id="flow-enable" type="checkbox" v-model="advance.data.flow.enable">
+          <label>&nbsp;</label>
+        </div>
+      </th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr>
+      <td colspan="2">
+        <form class="ui form" onsubmit="return false;">
+          <div class="field">
+            <textarea style="min-height: 600px;" v-model="advance.data.flow.flow"
+                      v-bind:placeholder="$t('advance.flow_table.flow')"
+                      v-on:input="flowChanged()"></textarea>
+          </div>
+        </form>
+      </td>
+    </tr>
+    </tbody>
+    <tfoot>
+    <th></th>
+    <th>
+      <div class="ui right floated small labeled icon button"
+           v-bind:class="{[theme.primary]: true, 'disabled': !advance.data.flow.modified}"
+           v-on:click="updateFlow()">
+        <i class="check icon"></i>
+        {{ $t("advance.flow_table.apply") }}
+      </div>
+    </th>
+    </tfoot>
+  </table>
+  <!-- flow -->
+</div>

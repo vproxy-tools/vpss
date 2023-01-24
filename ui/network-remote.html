@@ -1,0 +1,77 @@
+<!-- ok -->
+<div id="app-network-remote" v-show="network.page == 'remote'">
+  <div v-for="net in network.data.networks">
+    <table class="ui single line unstackable table" v-bind:class="[theme.primary]">
+      <thead>
+        <tr>
+          <th colspan="2">{{ $t("network.vni") }}: {{ network_name(net.vni) }}</th>
+          <th class="right aligned">
+            <label>{{ $t("network.remote.link_to_remote") }}</label>
+            <div class="ui fitted slider checkbox" v-on:click="toggleEnableDisableNetRemoteSw(net)">
+              <input v-bind:id="'remote-sw-' + net.vni" type="checkbox" v-model="net.remote.enable">
+              <label>&nbsp;</label>
+            </div>
+          </th>
+        </tr>
+        <tr v-if="net.remote.enable">
+          <th class="three wide right aligned">{{ $t("network.remote.config_key") }}</th>
+          <th class="nine wide">{{ $t("network.remote.config_value") }}</th>
+          <th class="four wide right aligned">{{ $t("operation") }}</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr class="disabled" v-if="!net.remote.enable">
+          <td class="center aligned" colspan="3">{{ $t("network.remote.remote_is_disabled") }}</td>
+        </tr>
+        <template v-if="net.remote.enable">
+          <tr>
+            <td class="right aligned">{{ $t("network.remote.ip_and_port") }}</td>
+            <td class="ui form">
+              <div class="field"><input type="text" v-bind:placeholder="[ $t('network.remote.ip_and_port') ]"
+                  v-model="net.remote.ipport" v-on:input="netRemoteSwChanged(net)"></div>
+            </td>
+            <td>&nbsp;</td>
+          </tr>
+          <tr>
+            <td class="right aligned">{{ $t("network.remote.username") }}</td>
+            <td class="ui form">
+              <div class="field"><input type="text" v-bind:placeholder="[ $t('network.remote.username') ]"
+                  v-model="net.remote.username" v-on:input="netRemoteSwChanged(net)"></div>
+            </td>
+            <td>&nbsp;</td>
+          </tr>
+          <tr>
+            <td class="right aligned">{{ $t("network.remote.password") }}</td>
+            <td class="ui form">
+              <div class="field"><input type="password" v-bind:placeholder="[ $t('network.remote.password') ]"
+                  v-model="net.remote.password" v-on:input="netRemoteSwChanged(net)"></div>
+            </td>
+            <td>&nbsp;</td>
+          </tr>
+          <tr>
+            <td class="right aligned">{{ $t("network.remote.allow_dhcp") }}</td>
+            <td>
+              <div class="ui fitted slider checkbox" v-on:click="toggleAllowDisallowDhcpRemoteSw(net)">
+                <input v-bind:id="'remote-sw-' + net.vni + '-dhcp'" type="checkbox" v-model="net.remote.allowDhcp">
+                <label>&nbsp;</label>
+              </div>
+            </td>
+            <td>&nbsp;</td>
+          </tr>
+        </template>
+      </tbody>
+      <tfoot>
+        <th colspan="2">&nbsp;</th>
+        <th>
+          <div class="ui right floated small labeled icon button"
+            v-bind:class="{[theme.primary]: true, 'disabled': !net.remote.modified}"
+            v-on:click="updateRemoteSwitch(net)">
+            <i class="check icon"></i>
+            {{ $t("network.remote.apply") }}
+          </div>
+        </th>
+      </tfoot>
+    </table>
+    <div style="margin-bottom: 20px;"></div>
+  </div> <!-- remote -->
+</div>

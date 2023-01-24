@@ -1,0 +1,78 @@
+<!-- ok -->
+<div id="app-advance-wblist" v-show="advance.page == 'wblist'">
+  <table class="ui single line unstackable table" v-bind:class="[theme.primary]">
+    <thead>
+      <tr>
+        <th colspan="5">{{ $t("advance.wblist.head") }}</th>
+      </tr>
+      <tr v-if="advance.data.wblists.length">
+        <th class="three wide">{{ $t("advance.wblist.name") }}</th>
+        <th class="three wide">{{ $t("advance.wblist.source_mac") }}</th>
+        <th class="three wide">{{ $t("advance.wblist.target") }}</th>
+        <th class="three wide">{{ $t("advance.wblist.type") }}</th>
+        <th class="four wide right aligned">{{ $t("operation") }}</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr v-if="advance.data.wblists.length == 0">
+        <td class="disabled center aligned" colspan="5">
+          {{ $t("advance.wblist.no_wblists") }}
+        </td>
+      </tr>
+      <template v-for="wblist in advance.data.wblists">
+        <tr>
+          <td>{{ wblist.name }}</td>
+          <td class="mono">{{ wblist.sourceMac }}</td>
+          <td class="mono">{{ wblist.target }}</td>
+          <td><i class="icon"
+              v-bind:class="{'check': wblist.type == 'white', 'close': wblist.type == 'black', [theme.primary]: wblist.type == 'white', [theme.secondary]: wblist.type == 'black'}"></i>
+            {{ $t("advance.wblist.type." + wblist.type) }}</td>
+          <td class="right aligned">
+            <div class="ui right floated tiny labeled icon button"
+              v-bind:class="[theme.secondary, wblist.system?'disabled':'']" v-on:click="delWBList(wblist.name)">
+              <i class="minus icon"></i>
+              {{ $t("advance.wblist.remove") }}
+            </div>
+          </td>
+        </tr>
+      </template>
+    </tbody>
+    <tfoot class="full-width">
+      <tr>
+        <th>
+          <div class="ui input"><input type="text" v-bind:placeholder="[ $t('advance.wblist.name') ]"
+              v-model="advance.data.new_wblist.name"></div>
+        </th>
+        <th>
+          <div class="ui input"><input type="text" v-bind:placeholder="[ $t('advance.wblist.source_mac.placeholder') ]"
+              v-model="advance.data.new_wblist.sourceMac"></div>
+        </th>
+        <th>
+          <div class="ui input"><input type="text" v-bind:placeholder="[ $t('advance.wblist.target.placeholder') ]"
+              v-model="advance.data.new_wblist.target"></div>
+        </th>
+        <th>
+          <div class="ui dropdown item">
+            {{ $t("advance.wblist.type." + advance.data.new_wblist.type) }}
+            <i class="dropdown icon"></i>
+            <div class="menu">
+              <div class="item" v-on:click="advance.data.new_wblist.type = 'white'">
+                {{ $t("advance.wblist.type.white") }}</div>
+              <div class="item" v-on:click="advance.data.new_wblist.type = 'black'">
+                {{ $t("advance.wblist.type.black") }}</div>
+            </div>
+          </div>
+        </th>
+        <th>
+          <div class="ui right floated small labeled icon button" v-bind:class="[theme.primary]"
+            v-on:click="addWBList()">
+            <i class="add icon"></i>
+            {{ $t("advance.wblist.add") }}
+          </div>
+        </th>
+      </tr>
+    </tfoot>
+  </table>
+  <div style="margin-bottom: 20px;"></div>
+  <!-- wblist -->
+</div>

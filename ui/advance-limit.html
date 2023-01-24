@@ -1,0 +1,121 @@
+<!-- ok -->
+<div id="app-advance-limit" v-show="advance.page == 'limit'">
+  <table class="ui single line unstackable table" v-bind:class="[theme.primary]">
+    <thead>
+      <tr>
+        <th colspan="6">{{ $t("advance.limit.head") }}</th>
+      </tr>
+      <tr v-if="advance.data.limits.length">
+        <th class="three wide">{{ $t("advance.limit.name") }}</th>
+        <th class="two wide">{{ $t("advance.limit.source_mac") }}</th>
+        <th class="two wide">{{ $t("advance.limit.target") }}</th>
+        <th class="two wide">{{ $t("advance.limit.type") }}</th>
+        <th class="three wide">{{ $t("advance.limit.value") }}</th>
+        <th class="four wide right aligned">{{ $t("operation") }}</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr v-if="advance.data.limits.length == 0">
+        <td class="disabled center aligned" colspan="6">
+          {{ $t("advance.limit.no_limits") }}
+        </td>
+      </tr>
+      <template v-for="limit in advance.data.limits">
+        <tr>
+          <td>{{ limit.name }}</td>
+          <td class="mono">{{ limit.sourceMac }}</td>
+          <td class="mono">{{ limit.target }}</td>
+          <td><i class="icon arrow"
+              v-bind:class="{'up': limit.type == 'upstream', 'down': limit.type == 'downstream', [theme.secondary]: limit.type == 'upstream', [theme.primary]: limit.type == 'downstream'}"></i>
+            {{ $t("advance.limit.type." + limit.type) }}</td>
+          <td>{{ limit.value }}Mbps</td>
+          <td class="right aligned">
+            <div class="ui tiny icon buttons">
+              <div class="ui icon button" v-on:click="showLimitStatistics(limit)"
+                v-bind:class="[limit.show_statistics?theme.primary:'']">
+                <i class="chart line icon"></i>
+              </div>
+            </div>
+            <div class="ui right floated tiny labeled icon button"
+              v-bind:class="[theme.secondary, limit.system?'disabled':'']" v-on:click="delLimit(limit.name)">
+              <i class="minus icon"></i>
+              {{ $t("advance.limit.remove") }}
+            </div>
+          </td>
+        </tr>
+        <tr v-show="limit.show_statistics">
+          <td colspan="6">
+            <div>
+              <div class="ui small buttons">
+                <div class="ui button"
+                  v-bind:class="{'active':limit.statistics_duration == 900000 || !limit.statistics_duration}"
+                  v-on:click="setLimitStatisticsDuration(limit, 900000)">
+                  {{ $t("statistics.last15minutes") }}</div>
+                <div class="ui button" v-bind:class="{'active':limit.statistics_duration == 3600000}"
+                  v-on:click="setLimitStatisticsDuration(limit, 3600000)">
+                  {{ $t("statistics.last1hour") }}
+                </div>
+                <div class="ui button" v-bind:class="{'active':limit.statistics_duration == 10800000}"
+                  v-on:click="setLimitStatisticsDuration(limit, 10800000)">
+                  {{ $t("statistics.last3hours") }}
+                </div>
+                <div class="ui button" v-bind:class="{'active':limit.statistics_duration == 21600000}"
+                  v-on:click="setLimitStatisticsDuration(limit, 21600000)">
+                  {{ $t("statistics.last6hours") }}
+                </div>
+                <div class="ui button" v-bind:class="{'active':limit.statistics_duration == 86400000}"
+                  v-on:click="setLimitStatisticsDuration(limit, 86400000)">
+                  {{ $t("statistics.last1day") }}
+                </div>
+              </div>
+              <canvas v-bind:id="'limit-statistics-' + limit.name" height="60px"></canvas>
+            </div>
+          </td>
+        </tr>
+      </template>
+    </tbody>
+    <tfoot class="full-width">
+      <tr>
+        <th>
+          <div class="ui input"><input type="text" v-bind:placeholder="[ $t('advance.limit.name') ]"
+              v-model="advance.data.new_limit.name"></div>
+        </th>
+        <th>
+          <div class="ui input"><input type="text" v-bind:placeholder="[ $t('advance.limit.source_mac.placeholder') ]"
+              v-model="advance.data.new_limit.sourceMac"></div>
+        </th>
+        <th>
+          <div class="ui input"><input type="text" v-bind:placeholder="[ $t('advance.limit.target.placeholder') ]"
+              v-model="advance.data.new_limit.target"></div>
+        </th>
+        <th>
+          <div class="ui dropdown item">
+            {{ $t("advance.limit.type." + advance.data.new_limit.type) }}
+            <i class="dropdown icon"></i>
+            <div class="menu">
+              <div class="item" v-on:click="advance.data.new_limit.type = 'upstream'">
+                {{ $t("advance.limit.type.upstream") }}</div>
+              <div class="item" v-on:click="advance.data.new_limit.type = 'downstream'">
+                {{ $t("advance.limit.type.downstream") }}</div>
+            </div>
+          </div>
+        </th>
+        <th>
+          <div class="ui right labeled input"><input type="text" v-bind:placeholder="[ $t('advance.limit.value') ]"
+              v-model="advance.data.new_limit.value">
+            <div class="ui basic label" style="font-weight: 400;">Mbps</div>
+          </div>
+        </th>
+        <th>
+          <div class="ui right floated small labeled icon button" v-bind:class="[theme.primary]"
+            v-on:click="addLimit()">
+            <i class="add icon"></i>
+            {{ $t("advance.limit.add") }}
+          </div>
+        </th>
+      </tr>
+    </tfoot>
+  </table>
+  <div style="margin-bottom: 20px;"></div>
+  <!-- limit -->
+</div>

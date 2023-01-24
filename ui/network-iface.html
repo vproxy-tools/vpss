@@ -1,0 +1,175 @@
+<!-- ok -->
+<div id="app-network-iface" v-show="network.page == 'iface'">
+  <div>
+    <table class="ui single line unstackable table" v-bind:class="[theme.primary]">
+      <thead>
+        <tr>
+          <th colspan="6">{{ $t("network.managed_ifaces") }}</th>
+        </tr>
+        <tr>
+          <th class="three wide">{{ $t("network.iface.ifname") }}</th>
+          <th class="two wide">{{ $t("network.iface.ifenabled") }}</th>
+          <th class="two wide">{{ $t("network.iface.allow_dhcp") }}</th>
+          <th class="three wide center aligned">{{ $t("network.iface.ifspeed") }}</th>
+          <th class="two wide center aligned">{{ $t("network.vni") }}</th>
+          <th class="four wide right aligned">{{ $t("operation") }}</th>
+        </tr>
+      </thead>
+      <tbody>
+        <template v-for="iface in network.data.managed">
+          <tr>
+            <td>{{ iface.name }}</td>
+            <td>
+              <div class="ui fitted slider checkbox" v-on:click="toggleEnableDisable(iface.name)">
+                <input v-bind:id="'managed-enable-' + iface.name" type="checkbox" v-model="iface.enable">
+                <label>&nbsp;</label>
+              </div>
+            </td>
+            <td>
+              <div class="ui fitted slider checkbox" v-on:click="toggleAllowDisallowDhcp(iface.name)">
+                <input v-bind:id="'managed-dhcp-' + iface.name" type="checkbox" v-model="iface.allowDhcp">
+                <label>&nbsp;</label>
+              </div>
+            </td>
+            <td class="center aligned">{{ iface.speed }}</td>
+            <td class="center aligned">{{ network_name(iface.vni) }}</td>
+            <td class="right aligned">
+              <div class="ui tiny icon buttons">
+                <div class="ui icon button" v-on:click="showIfaceStatistics(iface)"
+                  v-bind:class="[iface.show_statistics?theme.primary:'']">
+                  <i class="chart line icon"></i>
+                </div>
+              </div>
+              <div class="ui right floated tiny labeled icon button"
+                v-bind:class="[theme.danger,network.data.managed.length==1?'disabled':'']"
+                v-on:click="unmanageIface(iface)">
+                <i class="minus icon"></i>
+                {{ $t("network.iface.remove") }}
+              </div>
+            </td>
+          </tr>
+          <tr v-show="iface.show_statistics">
+            <td colspan="6">
+              <div>
+                <div class="ui small buttons">
+                  <div class="ui button"
+                    v-bind:class="{'active':iface.statistics_duration == 900000 || !iface.statistics_duration}"
+                    v-on:click="setIfaceStatisticsDuration(iface, 900000)">
+                    {{ $t("statistics.last15minutes") }}</div>
+                  <div class="ui button" v-bind:class="{'active':iface.statistics_duration == 3600000}"
+                    v-on:click="setIfaceStatisticsDuration(iface, 3600000)">
+                    {{ $t("statistics.last1hour") }}
+                  </div>
+                  <div class="ui button" v-bind:class="{'active':iface.statistics_duration == 10800000}"
+                    v-on:click="setIfaceStatisticsDuration(iface, 10800000)">
+                    {{ $t("statistics.last3hours") }}
+                  </div>
+                  <div class="ui button" v-bind:class="{'active':iface.statistics_duration == 21600000}"
+                    v-on:click="setIfaceStatisticsDuration(iface, 21600000)">
+                    {{ $t("statistics.last6hours") }}
+                  </div>
+                  <div class="ui button" v-bind:class="{'active':iface.statistics_duration == 86400000}"
+                    v-on:click="setIfaceStatisticsDuration(iface, 86400000)">
+                    {{ $t("statistics.last1day") }}
+                  </div>
+                </div>
+                <canvas v-bind:id="'iface-statistics-' + iface.name" height="60px"></canvas>
+              </div>
+            </td>
+          </tr>
+        </template>
+      </tbody>
+    </table>
+  </div> <!-- managed -->
+  <div style="margin-top: 20px;">
+    <table class="ui single line unstackable table" v-bind:class="[theme.primary]">
+      <thead>
+        <tr>
+          <th colspan="6">{{ $t("network.unmanaged_ifaces") }}</th>
+        </tr>
+        <tr v-if="network.data.unmanaged.length">
+          <th class="three wide">{{ $t("network.iface.ifname") }}</th>
+          <th class="two wide">&nbsp;</th>
+          <th class="two wide">&nbsp;</th>
+          <th class="three wide center aligned">{{ $t("network.iface.ifspeed") }}</th>
+          <th class="two wide center aligned">&nbsp;</th>
+          <th class="four wide right aligned">{{ $t("operation") }}</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr v-if="network.data.unmanaged.length == 0">
+          <td class="disabled center aligned" colspan="6">
+            {{ $t("network.iface.no_unmanaged_ifaces") }}
+          </td>
+        </tr>
+        <tr v-for="iface in network.data.unmanaged">
+          <td>{{ iface.name }}</td>
+          <td>&nbsp;</td>
+          <td>&nbsp;</td>
+          <td class="center aligned">{{ iface.speed }}</td>
+          <td class="center aligned">&nbsp;</td>
+          <td class="right aligned">
+            <div class="ui right floated tiny labeled icon button" v-bind:class="[theme.primary]"
+              v-on:click="manageIface(iface.name)">
+              <i class="add icon"></i>
+              {{ $t("network.iface.add") }}
+            </div>
+          </td>
+        </tr>
+      </tbody>
+      <tfoot class="full-width">
+        <tr v-if="network.data.unmanaged.length">
+          <th colspan="6" style="text-align: right;">
+            <div class="ui labeled input">
+              <label for="add_iface_vni" class="ui label">{{ $t("network.vni") }}</label>
+              <input type="text" v-bind:placeholder="$t('network.iface.add_iface_vni')" id="add_iface_vni"
+                v-model="network.data.new_iface.vni">
+            </div>
+          </th>
+        </tr>
+      </tfoot>
+    </table>
+  </div> <!-- unmanaged -->
+  <div style="margin-top: 20px;" v-if="network.data.nicsTombstone.length">
+    <table class="ui single line unstackable table" v-bind:class="[theme.primary]">
+      <thead>
+        <tr>
+          <th colspan="6" style="color: #bebebe;">{{ $t("network.tombstone_ifaces") }}</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr class="disabled">
+          <td class="three wide">{{ $t("network.iface.ifname") }}</td>
+          <td class="two wide">{{ $t("network.iface.ifenabled") }}</td>
+          <td class="two wide">{{ $t("network.iface.allow_dhcp") }}</td>
+          <td class="three wide center aligned">{{ $t("network.iface.ifspeed") }}</td>
+          <td class="two wide center aligned">{{ $t("network.vni") }}</td>
+          <td class="four wide right aligned">{{ $t("operation") }}</td>
+        </tr>
+        <tr class="disabled" v-for="iface in network.data.nicsTombstone">
+          <td>{{ iface.name }}</td>
+          <td>
+            <div class="ui fitted slider disabled checkbox">
+              <input type="checkbox" v-model="iface.enable">
+              <label>&nbsp;</label>
+            </div>
+          </td>
+          <td>
+            <div class="ui fitted slider disabled checkbox">
+              <input type="checkbox" v-model="iface.allowDhcp">
+              <label>&nbsp;</label>
+            </div>
+          </td>
+          <td class="center aligned">{{ iface.speed }}</td>
+          <td class="center aligned">{{ network_name(iface.vni) }}</td>
+          <td class="right aligned">&nbsp;</td>
+        </tr>
+        <tr class="disabled center aligned">
+          <td colspan="6">
+            {{ $t("network.tombstone_ifaces.hint") }}
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div> <!-- tombstone -->
+</div>

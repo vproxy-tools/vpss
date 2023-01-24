@@ -1,0 +1,75 @@
+<!-- ok -->
+<div id="app-network-route" v-show="network.page == 'route'">
+  <div v-for="net in network.data.networks">
+    <table class="ui single line unstackable table" v-bind:class="[theme.primary]">
+      <thead>
+        <tr>
+          <th colspan="6">{{ $t("network.vni") }}: {{ network_name(net.vni) }}</th>
+        </tr>
+        <tr>
+          <th class="three wide">{{ $t("network.route.name") }}</th>
+          <th class="four wide">{{ $t("network.route.target") }}</th>
+          <th class="two wide">{{ $t("network.route.type") }}</th>
+          <th class="four wide">{{ $t("network.route.argument") }}</th>
+          <th class="three wide right aligned">{{ $t("operation") }}</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr v-for="route in net.routes">
+          <td>{{ route.name }}</td>
+          <td class="mono">{{ route.target }}</td>
+          <td>{{ $t("network.route.type." + route.type) }}</td>
+          <td class="mono">{{ route.argument }}</td>
+          <td class="right aligned">
+            <div class="ui right floated tiny labeled icon button"
+              v-bind:class="[theme.secondary, route.system?'disabled':'']" v-on:click="delRoute(net, route.name)">
+              <i class="minus icon"></i>
+              {{ $t("network.route.remove") }}
+            </div>
+          </td>
+        </tr>
+      </tbody>
+      <tfoot class="full-width">
+        <tr>
+          <th>
+            <div class="ui input"><input type="text" v-bind:placeholder="[ $t('network.route.name') ]"
+                v-model="net.new_route.name"></div>
+          </th>
+          <th>
+            <div class="ui input"><input type="text" v-bind:placeholder="[ $t('network.route.target') ]"
+                v-model="net.new_route.target"></div>
+          </th>
+          <th>
+            <div class="ui dropdown item">
+              {{ $t("network.route.type." + net.new_route.type) }}
+              <i class="dropdown icon"></i>
+              <div class="menu">
+                <div class="item" v-on:click="vueForceUpdate(() => net.new_route.type = 'local')">
+                  {{ $t("network.route.type.local") }}
+                </div>
+                <div class="item" v-on:click="vueForceUpdate(() => net.new_route.type = 'intervlan')">
+                  {{ $t("network.route.type.intervlan") }}
+                </div>
+                <div class="item" v-on:click="vueForceUpdate(() => net.new_route.type = 'gateway')">
+                  {{ $t("network.route.type.gateway") }}
+                </div>
+              </div>
+            </div>
+          </th>
+          <th>
+            <div class="ui input"><input type="text" v-bind:placeholder="[ $t('network.route.argument') ]"
+                v-model="net.new_route.argument"></div>
+          </th>
+          <th>
+            <div class="ui right floated small labeled icon button" v-bind:class="[theme.primary]"
+              v-on:click="addRoute(net)">
+              <i class="add icon"></i>
+              {{ $t("network.route.add") }}
+            </div>
+          </th>
+        </tr>
+      </tfoot>
+    </table>
+    <div style="margin-bottom: 20px;"></div>
+  </div> <!-- route -->
+</div>

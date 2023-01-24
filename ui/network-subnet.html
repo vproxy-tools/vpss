@@ -1,0 +1,122 @@
+<!-- ok -->
+<div id="app-network-subnet" v-show="network.page == 'subnet'">
+  <table class="ui single line unstackable table" v-bind:class="[theme.primary]">
+    <thead>
+      <tr>
+        <th class="three wide">{{ $t("network.vni") }}</th>
+        <th class="four wide">{{ $t("network.subnet.v4net") }}</th>
+        <th class="four wide">{{ $t("network.subnet.v6net") }}</th>
+        <th class="two wide">{{ $t("network.subnet.allow_ipv6") }}</th>
+        <th class="three wide right aligned">{{ $t("operation") }}</th>
+      </tr>
+    </thead>
+    <tbody>
+      <template v-for="net in network.data.networks">
+        <tr>
+          <td>{{ network_name(net.vni) }}</td>
+          <td class="mono">{{ net.v4net }}</td>
+          <td class="mono">{{ (!!(net.v6net) ? net.v6net : "-") }}</td>
+          <td>
+            <div class="ui fitted slider checkbox" v-on:click="toggleAllowDisallowIpv6(net)">
+              <input v-bind:id="'network-allow-ipv6-' + net.vni" type="checkbox" v-model="net.allowIpv6">
+              <label>&nbsp;</label>
+            </div>
+          </td>
+          <td class="right aligned">
+            <div class="ui tiny icon buttons">
+              <div class="ui icon button" v-on:click="showNetworkArp(net)"
+                v-bind:class="[net.show_arp?theme.primary:'']">
+                <i class="th list icon"></i>
+              </div>
+            </div>
+            <div class="ui right floated tiny labeled icon button"
+              v-bind:class="[theme.danger, net.system?'disabled':'']" v-on:click="delNetwork(net.vni)">
+              <i class="minus icon"></i>
+              {{ $t("network.subnet.remove") }}
+            </div>
+          </td>
+        </tr>
+        <tr v-show="net.show_arp" style="background-color: #e6e6e6;">
+          <td colspan="5" style="padding-top: 3px; padding-bottom: 3px; padding-right: 3px; padding-left: 30px;">
+            <table class="ui unstackable table" style="border-top-width: 0px; border-radius: 0px;"
+              v-bind:class="[theme.primary]">
+              <thead v-if="net.arp.length">
+                <th class="one wide">{{ $t("network.arp.iface") }}</th>
+                <th class="four wide">{{ $t("network.arp.mac") }}</th>
+                <th class="three wide">{{ $t("network.arp.ip") }}</th>
+                <th class="two wide">{{ $t("network.arp.mac_ttl") }}</th>
+                <th class="two wide">{{ $t("network.arp.arp_ttl") }}</th>
+                <th class="four wide right aligned">{{ $t("operation") }}</th>
+              </thead>
+              <tbody>
+                <tr v-if="net.arp.length == 0">
+                  <td colspan="6" class="disabled center aligned">{{ $t("network.arp.no_arp_entries") }}</td>
+                </tr>
+                <tr v-for="arp in net.arp">
+                  <td>{{ arp.iface }}</td>
+                  <td class="mono">{{ arp.mac }}</td>
+                  <td class="mono">{{ !!arp.ip ? arp.ip : '-' }}</td>
+                  <td>{{ arp.macTTL }}</td>
+                  <td>{{ arp.arpTTL }}</td>
+                  <td>
+                    <div class="ui right floated tiny labeled icon gray button" v-on:click="delArpEntry(net, arp)">
+                      <i class="minus icon"></i>
+                      {{ $t("network.arp.remove") }}
+                    </div>
+                  </td>
+                </tr>
+              </tbody>
+              <tfoot>
+                <th>
+                  <div class="ui input"><input type="text" v-bind:placeholder="[ $t('network.arp.iface') ]"
+                      v-model="net.new_arp.iface"></div>
+                </th>
+                <th>
+                  <div class="ui input"><input type="text" v-bind:placeholder="[ $t('network.arp.mac') ]"
+                      v-model="net.new_arp.mac"></div>
+                </th>
+                <th>
+                  <div class="ui input"><input type="text" v-bind:placeholder="[ $t('network.arp.ip') ]"
+                      v-model="net.new_arp.ip"></div>
+                </th>
+                <th class="right aligned" colspan="3">
+                  <div class="ui right floated tiny labeled icon button" v-bind:class="[theme.primary]"
+                    v-on:click="addArpEntry(net)">
+                    <i class="add icon"></i>
+                    {{ $t("network.arp.add") }}
+                  </div>
+                </th>
+              </tfoot>
+            </table>
+          </td>
+        </tr>
+      </template>
+    </tbody>
+    <tfoot class="full-width">
+      <tr>
+        <th>
+          <div class="ui input"><input type="text" v-bind:placeholder="[ $t('network.vni') ]"
+              v-model="network.data.new_net.vni"></div>
+        </th>
+        <th>
+          <div class="ui input"><input type="text" v-bind:placeholder="[ $t('network.subnet.v4net') ]"
+              v-model="network.data.new_net.v4net"></div>
+        </th>
+        <th>
+          <div class="ui input"><input type="text"
+              v-bind:placeholder="[ $t('network.subnet.v6net') + '(' + $t('optional') + ')' ]"
+              v-model="network.data.new_net.v6net"></div>
+        </th>
+        <th>&nbsp;</th>
+        <th>
+          <div class="ui right floated small labeled icon button" v-bind:class="[theme.primary]"
+            v-on:click="addNetwork()">
+            <i class="add icon"></i>
+            {{ $t("network.subnet.add") }}
+          </div>
+        </th>
+      </tr>
+    </tfoot>
+  </table>
+  <!-- subnet -->
+</div>

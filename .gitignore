@@ -1,0 +1,35 @@
+# idea
+.idea/*
+launcher/.idea/*
+*.iml
+*.ipr
+*.iws
+out/
+launcher/out/
+
+# java
+*.jar
+*.class
+
+# log
+*.log
+
+# macos
+.DS_Store
+
+# gradle
+.gradle/
+build/
+launcher/.gradle/
+launcher/build/
+!gradlew
+!gradlew.bat
+!gradle/wrapper/gradle-wrapper.jar
+!gradle/wrapper/gradle-wrapper.properties
+!launcher/gradlew
+!launcher/gradlew.bat
+!launcher/gradle/wrapper/gradle-wrapper.jar
+!launcher/gradle/wrapper/gradle-wrapper.properties
+
+# docker
+misc/docker/vpss/ui/*

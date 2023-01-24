@@ -1,0 +1,68 @@
+#### table=0
+
+table=0,priority=2000,ipv6,predicate=drop_ipv6,actions=drop
+
+# dns in default network goto vpws-agent
+table=0,priority=1000,vni=1,udp,tp_dst=53,predicate=dl_src_is_vpws_agent,actions=goto_table:3
+table=0,priority=1000,vni=1,udp6,tp_dst=53,predicate=dl_src_is_vpws_agent,actions=goto_table:3
+table=0,priority=1000,vni=1,udp,tp_dst=53,actions=run:mod_dl_dst_to_vpws_agent,goto_table:3
+table=0,priority=1000,vni=1,udp6,tp_dst=53,actions=run:mod_dl_dst_to_vpws_agent,goto_table:3
+
+# all netflow to vgw.special.vproxy.io will be handled by the switch
+table=0,priority=999,tcp,nw_dst=100.118.103.119,tp_dst=22,actions=run:mod_dl_dst_to_virtual_ssh,pass
+table=0,priority=998,nw_dst=100.118.103.119,actions=run:mod_dl_dst_to_virtual,pass
+table=0,priority=998,arp,arp_op=1,arp_tpa=100.118.103.119,actions=run:mod_dl_dst_to_virtual,pass
+
+# all netflow to special network will be handled by vpws-agent
+table=0,priority=999,nw_dst=100.96.0.0/12,actions=run:mod_dl_dst_to_vpws_agent,goto_table:3
+
+# allow arp
+table=0,priority=900,arp,actions=goto_table:3
+# allow icmpv6
+table=0,priority=900,icmp6,actions=goto_table:3
+# allow dhcp and dhcp v6
+table=0,priority=901,udp,tp_src=67,tp_dst=68,predicate=disallow_dhcp,actions=drop
+table=0,priority=900,udp,tp_src=67,tp_dst=68,actions=goto_table:3
+table=0,priority=900,udp,tp_src=68,tp_dst=67,actions=goto_table:3
+table=0,priority=901,udp6,tp_src=547,tp_dst=546,predicate=disallow_dhcp,actions=drop
+table=0,priority=900,udp6,tp_src=547,tp_dst=546,actions=goto_table:3
+table=0,priority=900,udp6,tp_src=546,tp_dst=547,actions=goto_table:3
+
+# default rule
+table=0,priority=0,actions=goto_table:1
+
+
+
+#### table=1
+
+# user defined whitelist
+table=1,priority=800,ip,predicate=whitelist,actions=goto_table:2
+
+# user defined black list
+table=1,priority=500,ip,predicate=blacklist,actions=drop
+
+table=1,priority=0,actions=goto_table:2
+
+
+
+### table=2
+
+# user defined ratelimit
+table=2,priority=500,predicate=requires_ratelimit,actions=invoke:ratelimit
+
+# pass
+table=2,priority=0,actions=goto_table:3
+
+
+
+### table=3
+
+table=3,priority=100,ip,predicate=match_non_local_route,actions=run:mod_dl_dst_to_synthetic_ip,goto_table:4
+table=3,priority=100,ipv6,predicate=match_non_local_route,actions=run:mod_dl_dst_to_synthetic_ip,goto_table:4
+table=3,priority=0,actions=goto_table:4
+
+
+
+### table=4
+
+table=4,priority=0,actions=invoke:run_custom_flow

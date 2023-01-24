@@ -1,0 +1,124 @@
+<!-- ok -->
+<div id="app-network-vlan" v-show="network.page == 'vlan'">
+  <div v-for="vif in network.data.managed">
+    <table class="ui single line unstackable table" v-bind:class="[theme.primary]">
+      <thead>
+        <tr>
+          <th colspan="6">{{ vif.name }}</th>
+        </tr>
+        <tr v-if="vif.vlans.length">
+          <th class="three wide">{{ $t("network.remote_vlan") }}</th>
+          <th class="two wide">{{ $t("network.vlan.type") }}</th>
+          <th class="two wide">{{ $t("network.iface.ifenabled") }}</th>
+          <th class="two wide">{{ $t("network.iface.allow_dhcp") }}</th>
+          <th class="three wide center aligned">{{ $t("network.local_vni") }}</th>
+          <th class="four wide right aligned">{{ $t("operation") }}</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr v-if="vif.vlans.length == 0">
+          <td class="disabled center aligned" colspan="6">
+            {{ $t("network.vlan.no_vlans") }}
+          </td>
+        </tr>
+        <template v-for="vlan in vif.vlans">
+          <tr>
+            <td>{{ network_name(vlan.remoteVLan) }}</td>
+            <td>{{ !!(vlan.type) ? vlan.type : 'VLAN' }}</td>
+            <td>
+              <div class="ui fitted slider checkbox" v-on:click="toggleEnableDisableVLan(vif, vlan)">
+                <input v-bind:id="'iface-' + vif.name + '-vlan-' + vlan.remoteVLan + '-enable'" type="checkbox"
+                  v-model="vlan.enable">
+                <label>&nbsp;</label>
+              </div>
+            </td>
+            <td>
+              <div class="ui fitted slider checkbox" v-on:click="toggleAllowDisallowDhcpVLan(vif, vlan)">
+                <input v-bind:id="'iface-' + vif.name + '-vlan-' + vlan.remoteVLan + '-allow-dhcp'" type="checkbox"
+                  v-model="vlan.allowDhcp">
+                <label>&nbsp;</label>
+              </div>
+            </td>
+            <td class="center aligned">{{ network_name(vlan.localVni) }}</td>
+            <td class="right aligned">
+              <div class="ui tiny icon buttons">
+                <div class="ui icon button" v-on:click="showVLanStatistics(vif.name, vlan)"
+                  v-bind:class="[vlan.show_statistics?theme.primary:'']">
+                  <i class="chart line icon"></i>
+                </div>
+              </div>
+              <div class="ui right floated tiny labeled icon button" v-bind:class="[theme.secondary]"
+                v-on:click="delVLan(vif, vlan)">
+                <i class="minus icon"></i>
+                {{ $t("network.vlan.remove") }}
+              </div>
+            </td>
+          </tr>
+          <tr v-show="vlan.show_statistics">
+            <td colspan="6">
+              <div>
+                <div class="ui small buttons">
+                  <div class="ui button"
+                    v-bind:class="{'active':vlan.statistics_duration == 900000 || !vlan.statistics_duration}"
+                    v-on:click="setVLanStatisticsDuration(vlan, 900000)">
+                    {{ $t("statistics.last15minutes") }}</div>
+                  <div class="ui button" v-bind:class="{'active':vlan.statistics_duration == 3600000}"
+                    v-on:click="setVLanStatisticsDuration(vlan, 3600000)">
+                    {{ $t("statistics.last1hour") }}
+                  </div>
+                  <div class="ui button" v-bind:class="{'active':vlan.statistics_duration == 10800000}"
+                    v-on:click="setVLanStatisticsDuration(vlan, 10800000)">
+                    {{ $t("statistics.last3hours") }}
+                  </div>
+                  <div class="ui button" v-bind:class="{'active':vlan.statistics_duration == 21600000}"
+                    v-on:click="setVLanStatisticsDuration(vlan, 21600000)">
+                    {{ $t("statistics.last6hours") }}
+                  </div>
+                  <div class="ui button" v-bind:class="{'active':vlan.statistics_duration == 86400000}"
+                    v-on:click="setVLanStatisticsDuration(vlan, 86400000)">
+                    {{ $t("statistics.last1day") }}
+                  </div>
+                </div>
+                <canvas v-bind:id="'vlan-statistics-' + vif.name + '-' + vlan.remoteVLan" height="60px"></canvas>
+              </div>
+            </td>
+          </tr>
+        </template>
+      </tbody>
+      <tfoot class="full-width">
+        <tr>
+          <th colspan="2">
+            <div class="ui right labeled action input">
+              <input type="text" v-bind:placeholder="[ $t('network.remote_vlan') ]" v-model="vif.new_vlan.remoteVLan">
+              <div class="ui dropdown label">
+                <div class="text">{{ (vif.new_vlan.type == 'AUTO' ? $t("network.vlan.auto_type") : vif.new_vlan.type) }}
+                </div>
+                <i class="dropdown icon"></i>
+                <div class="menu">
+                  <div class="item" v-on:click="vif.new_vlan.type = 'AUTO'">{{ $t("network.vlan.auto_type") }}</div>
+                  <div class="item" v-on:click="vif.new_vlan.type = 'VLAN'">VLAN</div>
+                  <!-- TODO <div class="item" v-on:click="vif.new_vlan.type = 'VXLAN'">VXLAN</div> -->
+                </div>
+              </div>
+            </div>
+          </th>
+          <th>&nbsp;</th>
+          <th>&nbsp;</th>
+          <th>
+            <div class="ui input">
+              <input type="text" v-bind:placeholder="[ $t('network.local_vni') ]" v-model="vif.new_vlan.localVni">
+            </div>
+          </th>
+          <th>
+            <div class="ui right floated small labeled icon button" v-bind:class="[theme.primary]"
+              v-on:click="addVLan(vif)">
+              <i class="add icon"></i>
+              {{ $t("network.vlan.add") }}
+            </div>
+          </th>
+        </tr>
+      </tfoot>
+    </table>
+    <div style="margin-bottom: 20px;"></div>
+  </div> <!-- vlan -->
+</div>
