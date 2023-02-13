@@ -41,6 +41,10 @@ table=1,priority=800,ip,predicate=whitelist,actions=goto_table:2
 # user defined black list
 table=1,priority=500,ip,predicate=blacklist,actions=drop
 
+# drop tcp dns after whitelist
+table=1,priority=300,tcp,tp_dst=53,actions=drop
+table=1,priority=300,tcp6,tp_dst=53,actions=drop
+
 table=1,priority=0,actions=goto_table:2
 
 

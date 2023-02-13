@@ -96,28 +96,34 @@ public class VPSSPacketFilterBase extends BasePacketFilter {
         if (pkb.pkt.getType() == 2048 && pkb.pkt.getPacket() instanceof Ipv4Packet && predicate_blacklist(helper, pkb)) {
             return execute(helper, pkb, this::action9);
         }
+        if (pkb.pkt.getType() == 2048 && pkb.pkt.getPacket() instanceof Ipv4Packet && ((AbstractIpPacket) pkb.pkt.getPacket()).getProtocol() == 6 && BITWISE_INT_MATCHER_HOLDER_0.match(((TcpPacket) ((AbstractIpPacket) pkb.pkt.getPacket()).getPacket()).getDstPort())) {
+            return execute(helper, pkb, this::action10);
+        }
+        if (pkb.pkt.getType() == 34525 && pkb.pkt.getPacket() instanceof Ipv6Packet && ((AbstractIpPacket) pkb.pkt.getPacket()).getProtocol() == 6 && BITWISE_INT_MATCHER_HOLDER_0.match(((TcpPacket) ((AbstractIpPacket) pkb.pkt.getPacket()).getPacket()).getDstPort())) {
+            return execute(helper, pkb, this::action11);
+        }
         return table2(helper, pkb);
     }
 
     private FilterResult table2(PacketFilterHelper helper, PacketBuffer pkb) {
         if (predicate_requires_ratelimit(helper, pkb)) {
-            return execute(helper, pkb, this::action10);
+            return execute(helper, pkb, this::action12);
         }
         return table3(helper, pkb);
     }
 
     private FilterResult table3(PacketFilterHelper helper, PacketBuffer pkb) {
         if (pkb.pkt.getType() == 2048 && pkb.pkt.getPacket() instanceof Ipv4Packet && predicate_match_non_local_route(helper, pkb)) {
-            return execute(helper, pkb, this::action11);
+            return execute(helper, pkb, this::action13);
         }
         if (pkb.pkt.getType() == 34525 && pkb.pkt.getPacket() instanceof Ipv6Packet && predicate_match_non_local_route(helper, pkb)) {
-            return execute(helper, pkb, this::action12);
+            return execute(helper, pkb, this::action14);
         }
         return table4(helper, pkb);
     }
 
     private FilterResult table4(PacketFilterHelper helper, PacketBuffer pkb) {
-        return execute(helper, pkb, this::action13);
+        return execute(helper, pkb, this::action15);
     }
 
     private FilterResult action0(PacketFilterHelper helper, PacketBuffer pkb) {
@@ -167,20 +173,28 @@ public class VPSSPacketFilterBase extends BasePacketFilter {
     }
 
     private FilterResult action10(PacketFilterHelper helper, PacketBuffer pkb) {
-        return invoke_ratelimit(helper, pkb);
+        return FilterResult.DROP;
     }
 
     private FilterResult action11(PacketFilterHelper helper, PacketBuffer pkb) {
-        run_mod_dl_dst_to_synthetic_ip(helper, pkb);
-        return FilterResult.PASS;
+        return FilterResult.DROP;
     }
 
     private FilterResult action12(PacketFilterHelper helper, PacketBuffer pkb) {
+        return invoke_ratelimit(helper, pkb);
+    }
+
+    private FilterResult action13(PacketFilterHelper helper, PacketBuffer pkb) {
         run_mod_dl_dst_to_synthetic_ip(helper, pkb);
         return FilterResult.PASS;
     }
 
-    private FilterResult action13(PacketFilterHelper helper, PacketBuffer pkb) {
+    private FilterResult action14(PacketFilterHelper helper, PacketBuffer pkb) {
+        run_mod_dl_dst_to_synthetic_ip(helper, pkb);
+        return FilterResult.PASS;
+    }
+
+    private FilterResult action15(PacketFilterHelper helper, PacketBuffer pkb) {
         return invoke_run_custom_flow(helper, pkb);
     }
 

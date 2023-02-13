@@ -1,5 +1,9 @@
 # special network handling
 
+## tcp dns
+
+Any TCP packets targeting port 53 will be dropped to disable TCP DNS. This happends after whitelist check, so you may add whitelist rules to allow TCP DNS.
+
 ## vgw.special.vproxy.io
 
 The domain used to access or configure VPSS. The VPSS will directly respond the domain request to devices to ensure users can manage the device even when public network is down.
