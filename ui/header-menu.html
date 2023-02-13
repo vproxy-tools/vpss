@@ -23,6 +23,7 @@
             <i class="icon save"></i>{{ $t("menu.system.persist_current_config") }}</a>
           <a class="item" v-on:click="reboot()"><i class="icon undo"></i>{{ $t("menu.system.reboot") }}</a>
           <a class="item" v-on:click="shutdown()"><i class="icon power off"></i>{{ $t("menu.system.shutdown") }}</a>
+          <a class="item" href="command.html"><i class="icon terminal"></i>{{ $t("menu.system.command") }}</a>
           <a class="item" v-on:click="checkForUpdates()" v-if="!upgrade.upgrade">
             <i class="icon sync"></i>{{ $t("menu.system.checkForUpdates") }}</a>
           <a class="item" v-on:click="doUpgrade()" v-if="upgrade.upgrade">

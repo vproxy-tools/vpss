@@ -488,6 +488,8 @@ vproxyss.initI18n = function () {
 
       "err.bad_args.missing_vpws_agent_config": "没有指定配置文件",
 
+      "err.bad_args.missing_script": "没有指定要执行的脚本",
+
       'ipv6 not allowed': '该网络不支持IPv6',
 
       'title.login': '登录 VProxy Soft Switch',
@@ -496,6 +498,7 @@ vproxyss.initI18n = function () {
       'title.user': '用户选项',
       'title.vpws_agent': 'VPWS Agent',
       'title.advance': 'VPSS 高级配置',
+      'title.command': '执行命令',
 
       'operation': '操作',
       'optional': '可选',
@@ -520,6 +523,7 @@ vproxyss.initI18n = function () {
       'menu.system.persist_current_config.success.content': '配置持久化成功',
       'menu.system.reboot': '重新启动',
       'menu.system.shutdown': '关机',
+      'menu.system.command': '执行命令',
       'menu.system.checkForUpdates': '检查更新',
       'menu.system.upgrade': '更新',
       'menu.user.settings': '账户设置',
@@ -665,6 +669,11 @@ vproxyss.initI18n = function () {
       'vpwsagent.submit_config': '提交',
       'vpwsagent.config_submitted': '配置已提交，新配置加载可能还需一段时间',
       'vpwsagent.confighint': '注意：1. 请在配置中开启direct-relay，监听127.0.0.1:8888，处理100.96.0.0/12网段。2. 请在配置中开启DNS，监听53端口',
+
+      "command.script": "脚本",
+      "command.timeout": "超时时间（秒）",
+      "command.execute": "执行",
+      "command.result.empty": "无内容",
     },
   };
   var i18n = new VueI18n({

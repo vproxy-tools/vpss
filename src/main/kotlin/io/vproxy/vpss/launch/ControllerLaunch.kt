@@ -36,6 +36,7 @@ object ControllerLaunch {
       VPWSAgentController(app)
       FlowController(app)
       WBListController(app)
+      CommandController(app)
       staticController.handleLast()
       app.start()
     }

@@ -88,4 +88,6 @@ object ErrorCode {
   const val notFoundWBList = "err.not_found.wblist"
   const val badArgsInvalidWBListMac = "err.bad_args.invalid_wblist_mac"
   const val badArgsInvalidWBListIp = "err.bad_args.invalid_wblist_ip"
+
+  const val badArgsMissingScript = "err.bad_args.missing_script"
 }
