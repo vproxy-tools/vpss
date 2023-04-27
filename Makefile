@@ -15,11 +15,13 @@ clean:
 	rm -rf ./misc/docker/vpss/ui
 	rm -f ./misc/docker/vpws-agent-with-dhclient/vproxy.jar
 	rm -f ./misc/docker/vpss-launcher/vpss-launcher.jar
+	rm -f ./vproxy-no-kt-runtime.jar
 
 vproxy.jar:
 	wget https://github.com/wkgcass/vproxy/releases/download/$(VPROXY_VERSION)/vproxy-$(VPROXY_VERSION).jar
 	mv vproxy-$(VPROXY_VERSION).jar vproxy.jar
 
+.PHONY: vproxy-no-kt-runtime.jar
 vproxy-no-kt-runtime.jar: vproxy.jar
 	cp vproxy.jar vproxy-no-kt-runtime.jar
 	zip -d -q vproxy-no-kt-runtime.jar 'org/*'
@@ -35,13 +37,13 @@ pktgen: vproxy.jar
 	java -Deploy=PacketFilterGenerator -jar vproxy.jar in=./src/main/resources/flows.txt out=./src/main/java/io/vproxy/vpss/network/VPSSPacketFilterBase.java class=io.vproxy.vpss.network.VPSSPacketFilterBase
 
 .PHONY: compile
-compile: vproxy.jar pktgen
+compile: vproxy-no-kt-runtime.jar pktgen
 	bash ./gradlew shadowJar
 .PHONY: jar
 jar: compile
 
 .PHONY: compile-launcher
-compile-launcher: vproxy.jar
+compile-launcher: vproxy-no-kt-runtime.jar
 	cd launcher && bash ./gradlew shadowJar
 
 .PHONY: docker-base

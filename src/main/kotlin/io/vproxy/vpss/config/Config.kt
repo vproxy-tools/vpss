@@ -1,6 +1,6 @@
 package io.vproxy.vpss.config
 
-import io.vproxy.base.util.Utils
+import io.vproxy.commons.util.IOUtils
 import io.vproxy.dep.vjson.JSON
 import io.vproxy.vfd.MacAddress
 import io.vproxy.vpss.entity.Interface
@@ -82,7 +82,7 @@ class Config {
   }
 
   fun save() {
-    Utils.writeFileWithBackup("/etc/vpss/config.json", config.toJson().pretty() + "\n")
+    IOUtils.writeFileWithBackup("/etc/vpss/config.json", config.toJson().pretty() + "\n")
     savePwd()
   }
 
@@ -147,6 +147,6 @@ class Config {
   }
 
   fun savePwd() {
-    Utils.writeFileWithBackup("/etc/vpss/passwd", pwd.toJson().pretty() + "\n")
+    IOUtils.writeFileWithBackup("/etc/vpss/passwd", pwd.toJson().pretty() + "\n")
   }
 }

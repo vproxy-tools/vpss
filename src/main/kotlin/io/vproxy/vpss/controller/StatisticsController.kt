@@ -1,12 +1,12 @@
 package io.vproxy.vpss.controller
 
-import io.vproxy.dep.vjson.JSON
-import io.vproxy.dep.vjson.util.ObjectBuilder
 import io.vproxy.base.util.Logger
 import io.vproxy.base.util.Utils
 import io.vproxy.base.util.coll.Tuple3
 import io.vproxy.base.util.exception.XException
 import io.vproxy.base.util.ratelimit.StatisticsRateLimiter
+import io.vproxy.dep.vjson.JSON
+import io.vproxy.dep.vjson.util.ObjectBuilder
 import io.vproxy.lib.http.RoutingContext
 import io.vproxy.lib.http1.CoroutineHttp1Server
 import io.vproxy.vpss.util.Consts
@@ -135,7 +135,8 @@ class StatisticsController(app: CoroutineHttp1Server) : BaseController(app) {
 
   // return { name: String, input: {}, output: {}, historyTotalInput, historyTotalOutput }
   private fun getIfaceStatistics(ctx: RoutingContext): JSON.Instance<*> {
-    val (beginTs, endTs, step) = getBeginEndPeriod(ctx)
+    val tup3 = getBeginEndPeriod(ctx)
+    val (beginTs, endTs, step) = Triple(tup3._1, tup3._2, tup3._3)
     val name = ctx.param("iface")
 
     val iface = Global.getSwitch().ifaces.find { it.name().equals("xdp:$name") } ?: throw XException(ErrorCode.notFoundManagedIface)
@@ -147,7 +148,8 @@ class StatisticsController(app: CoroutineHttp1Server) : BaseController(app) {
 
   // return { remoteVLan: Int, input: {}, output: {}, historyTotalInput, historyTotalOutput }
   private fun getVLanStatistics(ctx: RoutingContext): JSON.Instance<*> {
-    val (beginTs, endTs, step) = getBeginEndPeriod(ctx)
+    val tup3 = getBeginEndPeriod(ctx)
+    val (beginTs, endTs, step) = Triple(tup3._1, tup3._2, tup3._3)
 
     val ifaceName = ctx.param("iface")
     val vlanStr = ctx.param("vlan")
@@ -169,7 +171,8 @@ class StatisticsController(app: CoroutineHttp1Server) : BaseController(app) {
 
   // return { name: String, data: {} }
   private fun getLimitStatistics(ctx: RoutingContext): JSON.Instance<*> {
-    val (beginTs, endTs, step) = getBeginEndPeriod(ctx)
+    val tup3 = getBeginEndPeriod(ctx)
+    val (beginTs, endTs, step) = Triple(tup3._1, tup3._2, tup3._3)
 
     val name = ctx.param("limit")
     val rl = Global.ratelimitHolder.find(name)

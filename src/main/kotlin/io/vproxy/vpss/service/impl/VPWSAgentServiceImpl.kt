@@ -5,6 +5,7 @@ import io.vproxy.base.util.LogType
 import io.vproxy.base.util.Logger
 import io.vproxy.base.util.Utils
 import io.vproxy.base.util.anno.Blocking
+import io.vproxy.commons.util.IOUtils
 import io.vproxy.lib.common.await
 import io.vproxy.lib.common.execute
 import io.vproxy.lib.common.launch
@@ -184,13 +185,13 @@ object VPWSAgentServiceImpl : VPWSAgentService {
     val loader = ConfigLoader()
     Global.getExecutorLoop().execute {
       resetRetryFields()
-      val f = Utils.writeTemporaryFile("vpws-agent", ".conf", conf.toByteArray())
+      val f = IOUtils.writeTemporaryFile("vpws-agent", ".conf", conf.toByteArray())
       loader.load(f)
       val errLs = loader.validate()
       if (errLs.isNotEmpty()) {
         throw Exception(errLs.toString())
       }
-      Utils.writeFileWithBackup("/etc/vpss/vpws-agent.conf", conf)
+      IOUtils.writeFileWithBackup("/etc/vpss/vpws-agent.conf", conf)
     }.await()
     Global.getExecutorLoop().launch { // do not wait for the result here
       executeEnsureContainer(true)

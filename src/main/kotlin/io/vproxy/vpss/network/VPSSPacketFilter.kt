@@ -1,7 +1,7 @@
 package io.vproxy.vpss.network
 
-import io.vproxy.base.dns.*
-import io.vproxy.base.dns.rdata.A
+import io.vproxy.vpacket.dns.*
+import io.vproxy.vpacket.dns.rdata.A
 import io.vproxy.base.util.LogType
 import io.vproxy.base.util.Logger
 import io.vproxy.base.util.ratelimit.RateLimiter

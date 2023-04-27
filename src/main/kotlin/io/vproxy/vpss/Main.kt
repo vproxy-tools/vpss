@@ -40,7 +40,7 @@ object Main {
 
   @JvmStatic
   fun main(args0: Array<String>) {
-    val args = io.vproxy.app.app.Main.checkFlagDeployInArguments(args0)
+    val args = MainUtils.checkFlagDeployInArguments(args0)
     System.setProperty("vfd", "posix")
     for (arg in args) {
       if (arg == "version" || arg == "--version" || arg == "-version" || arg == "-v") {

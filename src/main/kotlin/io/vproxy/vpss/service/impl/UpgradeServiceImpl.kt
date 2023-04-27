@@ -1,11 +1,12 @@
 package io.vproxy.vpss.service.impl
 
 import io.vproxy.app.app.Application
-import io.vproxy.base.dns.*
-import io.vproxy.base.dns.rdata.TXT
+import io.vproxy.base.dns.Resolver
+import io.vproxy.base.dns.VResolver
 import io.vproxy.base.util.LogType
 import io.vproxy.base.util.Logger
 import io.vproxy.base.util.Utils
+import io.vproxy.commons.util.IOUtils
 import io.vproxy.dep.vjson.JSON
 import io.vproxy.dep.vjson.cs.UTF8ByteArrayCharStream
 import io.vproxy.lib.common.await
@@ -13,6 +14,10 @@ import io.vproxy.lib.common.awaitCallback
 import io.vproxy.lib.common.execute
 import io.vproxy.lib.common.vplib
 import io.vproxy.lib.http1.CoroutineHttp1ClientConnection
+import io.vproxy.vpacket.dns.DNSClass
+import io.vproxy.vpacket.dns.DNSResource
+import io.vproxy.vpacket.dns.DNSType
+import io.vproxy.vpacket.dns.rdata.TXT
 import io.vproxy.vpss.config.Config
 import io.vproxy.vpss.service.UpgradeService
 import io.vproxy.vpss.util.Consts
@@ -131,7 +136,7 @@ object UpgradeServiceImpl : UpgradeService {
     for (image in images) {
       sb.append(image).append("\n")
     }
-    Utils.writeFileWithBackup(file, sb.toString())
+    IOUtils.writeFileWithBackup(file, sb.toString())
   }
 
   private fun getImageList(): List<String> {

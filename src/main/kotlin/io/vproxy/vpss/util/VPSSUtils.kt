@@ -10,6 +10,7 @@ import io.vproxy.base.util.exception.XException
 import io.vproxy.base.util.net.Nic
 import io.vproxy.base.util.ratelimit.SimpleRateLimiter
 import io.vproxy.base.util.ratelimit.StatisticsRateLimiter
+import io.vproxy.commons.util.IOUtils
 import io.vproxy.vfd.IP
 import io.vproxy.vfd.MacAddress
 import io.vproxy.vpss.config.Config
@@ -162,7 +163,7 @@ object VPSSUtils {
     } else {
       BPFObject.handleAllProgram()
     }
-    val file = Utils.writeTemporaryFile("bpf-$name", "o", bytes.toJavaArray())
+    val file = IOUtils.writeTemporaryFile("bpf-$name", "o", bytes.toJavaArray())
     val tup = try {
       if (!tryDriverMode) {
         manageNicSKB(file, chosen, vni, rxGenChecksum)
