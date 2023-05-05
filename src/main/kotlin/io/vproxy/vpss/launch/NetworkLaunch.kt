@@ -17,6 +17,8 @@ object NetworkLaunch {
     for (net in Config.get().config.networks) {
       createNetwork(net)
     }
+    // sync ips every few seconds
+    Application.get().controlEventLoop.selectorEventLoop.period(30_000) { syncIps() }
   }
 
   private fun createNetwork(net: Net) {
@@ -43,9 +45,6 @@ object NetworkLaunch {
       network.routeTable.addRule(rule)
       Logger.alert("route $rule added to network ${net.vni}")
     }
-
-    // sync ips every few seconds
-    Application.get().controlEventLoop.selectorEventLoop.period(30_000) { syncIps() }
   }
 
   private var printSyncIpsInfoCount = 0
