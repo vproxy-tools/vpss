@@ -1,4 +1,4 @@
-FROM vproxyio/vpss-base:1.0.0
+FROM vproxyio/vpss-base:2023-01-23
 
 COPY vproxy.jar /vproxy.jar
 COPY init-vpws-agent.sh /init-vpws-agent.sh

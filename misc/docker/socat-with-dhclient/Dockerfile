@@ -1,4 +1,4 @@
-FROM vproxyio/vpss-base:1.0.0
+FROM vproxyio/vpss-base:2023-01-23
 
 COPY init.sh /init.sh
 RUN chmod +x /init.sh

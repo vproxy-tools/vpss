@@ -1,3 +1,3 @@
-FROM vproxyio/vpss-base:1.0.0
+FROM vproxyio/vpss-base:2023-01-23
 
 ENTRYPOINT ["/usr/sbin/dhclient"]
