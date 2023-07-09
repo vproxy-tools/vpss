@@ -1,11 +1,13 @@
 package io.vproxy.vpss.service.impl
 
+import io.vproxy.app.plugin.impl.BasePacketFilter
 import io.vproxy.base.util.Logger
 import io.vproxy.base.util.Utils
 import io.vproxy.lib.common.await
 import io.vproxy.lib.common.execute
 import io.vproxy.vproxyx.pktfiltergen.flow.Flows
 import io.vproxy.vpss.config.Config
+import io.vproxy.vpss.network.VPSSPacketFilter
 import io.vproxy.vpss.service.FlowService
 import io.vproxy.vpss.util.Global
 import io.vproxy.vswitch.plugin.PacketFilter
@@ -57,21 +59,28 @@ object FlowServiceImpl : FlowService {
     Logger.alert("custom packet filter class file generated: $classFilePath")
     val cls = loadGeneratedClass(classFilePath)
     val o = cls.getConstructor().newInstance()
-    currentFilter = o as PacketFilter
+    val filter = o as PacketFilter
+    if (filter is BasePacketFilter) {
+      for (iface in Global.getSwitch().ifaces) {
+        filter.ifaceAdded(iface)
+      }
+    }
+    val old = this.currentFilter
+    this.currentFilter = filter
+    VPSSPacketFilter.clearIngressCache()
+    Logger.alert("filter replaced, old=$old, current=${this.currentFilter}")
   }
 
-  private const val classPrefix = "VPSSGeneratedCustomFlow";
+  private const val classPrefix = "VPSSGeneratedCustomFlow"
 
   private fun clearAllJavaAndClasses(javaFilePath: String, classFilePath: String) {
     val files = File(classFilePath).parentFile.listFiles()
-      ?: return
-    for (f in files) {
+    for (f in files!!) {
       if (!f.isFile) continue
       if (!f.name.startsWith(classPrefix)) continue
-      if (!f.name.endsWith(".java")) continue
-      if (!f.name.endsWith(".class")) continue
-      if (f.name == javaFilePath) continue
-      if (f.name == classFilePath) continue
+      if (!f.name.endsWith(".java") && !f.name.endsWith(".class")) continue
+      if (f.absolutePath == javaFilePath) continue
+      if (f.absolutePath == classFilePath) continue
       f.delete()
     }
   }
@@ -84,7 +93,7 @@ object FlowServiceImpl : FlowService {
     flows.add(flow)
     var clsName = f.name
     clsName = clsName.substring(0, clsName.length - ".java".length)
-    val content = flows.gen(clsName)
+    val content = flows.gen(clsName, FlowBasePacketFilter::class.qualifiedName)
     Files.writeString(f.toPath(), content)
     return f.absolutePath
   }

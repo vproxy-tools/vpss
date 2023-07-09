@@ -1,7 +1,5 @@
 package io.vproxy.vpss.network
 
-import io.vproxy.vpacket.dns.*
-import io.vproxy.vpacket.dns.rdata.A
 import io.vproxy.base.util.LogType
 import io.vproxy.base.util.Logger
 import io.vproxy.base.util.ratelimit.RateLimiter
@@ -12,6 +10,8 @@ import io.vproxy.vpacket.ArpPacket
 import io.vproxy.vpacket.Ipv4Packet
 import io.vproxy.vpacket.Ipv6Packet
 import io.vproxy.vpacket.PacketBytes
+import io.vproxy.vpacket.dns.*
+import io.vproxy.vpacket.dns.rdata.A
 import io.vproxy.vpss.config.Config
 import io.vproxy.vpss.entity.WBType
 import io.vproxy.vpss.service.impl.FlowServiceImpl
@@ -24,10 +24,13 @@ import io.vproxy.vswitch.iface.Iface
 import io.vproxy.vswitch.iface.SubIface
 import io.vproxy.vswitch.plugin.FilterResult
 
-class VPSSPacketFilter : VPSSPacketFilterBase() {
-  companion object {
-    private val vgwIp: IPv4 = Consts.vgwIp
-    private val dnsMsftncsiCom: IPv4 = IP.fromIPv4("131.107.255.255")
+
+object VPSSPacketFilter : VPSSPacketFilterBase() {
+  private val vgwIp: IPv4 = Consts.vgwIp
+  private val dnsMsftncsiCom: IPv4 = IP.fromIPv4("131.107.255.255")
+
+  public override fun clearIngressCache() {
+    super.clearIngressCache()
   }
 
   override fun handleIngress(helper: PacketFilterHelper, pkb: PacketBuffer): FilterResult {
@@ -175,6 +178,7 @@ class VPSSPacketFilter : VPSSPacketFilterBase() {
           null
         }
       }
+
       "ssh.vgw.special.vproxy.io." -> {
         val arpEntry = pkb.network.arpTable.lookupByMac(Config.get().config.virtualSSHMac!!)?.find { true }
         if (arpEntry != null && arpEntry.ip is IPv4) arpEntry.ip as IPv4 else {
@@ -182,6 +186,7 @@ class VPSSPacketFilter : VPSSPacketFilterBase() {
           null
         }
       }
+
       "web.vgw.special.vproxy.io." -> { // same as ssh
         val arpEntry = pkb.network.arpTable.lookupByMac(Config.get().config.virtualSSHMac!!)?.find { true }
         if (arpEntry != null && arpEntry.ip is IPv4) arpEntry.ip as IPv4 else {
@@ -189,6 +194,7 @@ class VPSSPacketFilter : VPSSPacketFilterBase() {
           null
         }
       }
+
       "dns.msftncsi.com." -> dnsMsftncsiCom
       else -> {
         vgwIp

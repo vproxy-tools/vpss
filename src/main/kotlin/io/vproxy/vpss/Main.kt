@@ -208,7 +208,7 @@ object Main {
     }
 
     Global.getSwitch().addIfaceWatcher(VPSSPreHandler())
-    val packetFilterPlugin = VPSSPacketFilter()
+    val packetFilterPlugin = VPSSPacketFilter
     packetFilterPlugin.init(PluginInitParams(arrayOf("switch=vpss")))
     val pluginWrapper = Application.get().pluginHolder.register("vpss", packetFilterPlugin)
     pluginWrapper.enable()
